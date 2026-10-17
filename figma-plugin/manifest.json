@@ -1,0 +1,9 @@
+{
+  "name": "Clima Agora — Gerador de Protótipo",
+  "id": "clima-agora-prototipo-local",
+  "api": "1.0.0",
+  "main": "code.js",
+  "editorType": ["figma"],
+  "documentAccess": "dynamic-page",
+  "networkAccess": { "allowedDomains": ["none"] }
+}
