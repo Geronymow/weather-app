@@ -1,93 +1,78 @@
-# Weather App
+# Clima Agora — protótipo Figma (app do tempo Android → Flutter)
 
+**Padrão de tela: Android Large 360×800 dp** (preset do Figma), definido em `SCREEN` no `figma-plugin/code.js`.
 
+App do tempo que detecta onde o usuário está e mostra **temperatura, hora e data locais**, previsão por hora e para 7 dias, detalhes (umidade, vento, UV, pressão, visibilidade, chuva), nascer/pôr do sol, qualidade do ar, cidades salvas e **alertas oficiais** (INMET/Defesa Civil).
 
-## Getting started
+Visual: Material 3, tema escuro com cards de “vidro” (glassmorphism) e fundo que muda conforme o tempo.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## Conteúdo da pasta
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+| Pasta | O que é |
+|---|---|
+| `figma-plugin/` | **Arquivo principal para importar.** Plugin que monta o arquivo inteiro no Figma: telas com Auto Layout, Variables de cor, estilos de texto, componentes e o protótipo navegável |
+| `figma-import-svg/` | As 8 telas em SVG, todas **Android Large 360×800**. É só arrastar para o Figma, e funciona também no **Figma web/Linux** |
+| `previews/` | PNGs de todas as telas (para relatório/apresentação) |
+| `tools/` | Simulador da API do Figma + script que gera os PNGs e os SVGs a partir do mesmo `code.js` |
 
-## Add your files
+## Como importar no Figma
 
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+### Opção A — Plugin (recomendado: editável, responsivo e navegável)
+> Para importar plugin de desenvolvimento é preciso o **Figma Desktop** (Windows/macOS). No Linux, use o cliente não oficial `figma-linux` ou a opção B.
 
+1. Abra o Figma Desktop e crie um arquivo de Design em branco.
+2. Menu **Plugins ▸ Development ▸ Import plugin from manifest…**
+3. Selecione `figma-plugin/manifest.json`.
+4. Rode em **Plugins ▸ Development ▸ Clima Agora — Gerador de Protótipo** (leva poucos segundos).
+5. Vá para a página **📱 Protótipo** e aperte **▶ Present** (fluxo “Abrir o app”).
+
+Páginas criadas (3):
+- **📱 Protótipo**: 8 telas 360×800 dp já ligadas (Splash → Boas-vindas → Permissão Android → Início → Locais/Ajustes/Alertas, e o estado Sem conexão).
+- **🎨 Design System**: cores (Variables `Clima/Tokens`), fundos dinâmicos, tipografia (`Clima/*`), ícones e componentes.
+- **🔌 APIs & Flutter**: tabela de integrações, fluxo de dados e o mapeamento de Figma para widgets Flutter.
+
+### Opção B — SVG (qualquer Figma, inclusive no navegador)
+Arraste os arquivos de `figma-import-svg/` para o canvas (as pranchas de Design System e APIs ficam em `figma-import-svg/extras/`). Cada tela vira um grupo com textos editáveis e vetores. Os SVGs **não trazem** Auto Layout nem as interações: para isso, use a opção A.
+
+## Responsividade
+
+Todas as telas saem em 360×800, mas são construídas com **Auto Layout + Fill container**: se você mudar a largura de uma tela no Figma, o conteúdo se reorganiza sozinho. O código também sabe montar o layout médio (≥ 600 dp): troque `SCREEN` para gerar outro tamanho. Os breakpoints seguem as *window size classes* do Material:
+
+| Classe | Largura | Layout |
+|---|---|---|
+| Compacto | < 600 dp | 1 coluna, grade de métricas 2×, NavigationBar inferior |
+| Médio | 600–839 dp | NavigationRail lateral, grade 3×, cards de sol e ar lado a lado |
+| Expandido | ≥ 840 dp | Rail + 2 painéis (lista de locais / detalhes) — próxima iteração |
+
+Outras escolhas: áreas de toque ≥ 48 dp, a hora do sistema e a barra de gestos do Android aparecem em todas as telas, e o carrossel horizontal das horas rola no Present.
+
+## Integrações externas previstas
+
+| Função | Serviço | Chave |
+|---|---|---|
+| Localização GPS | `geolocator` (Fused Location Provider) | — |
+| Nome do bairro/cidade | Nominatim (OpenStreetMap) reverse geocoding | não (1 req/s) |
+| Previsão atual/hora/7 dias, fuso e hora local | Open-Meteo Forecast (`timezone=auto`) | não |
+| Qualidade do ar | Open-Meteo Air Quality | não |
+| Busca de cidades | Open-Meteo Geocoding | não |
+| Alertas oficiais | INMET Alert-AS (CAP/RSS) | não |
+| Notificações em 2º plano | `workmanager` + `flutter_local_notifications` | — |
+
+Exemplo da chamada principal:
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/fmugroup/weather-app.git
-git branch -M main
-git push -uf origin main
+https://api.open-meteo.com/v1/forecast?latitude=-23.59&longitude=-46.63
+  &current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,pressure_msl,visibility,is_day
+  &hourly=temperature_2m,precipitation_probability,weather_code
+  &daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,precipitation_probability_max
+  &timezone=auto
 ```
 
-## Integrate with your tools
+## Rumo ao Flutter
 
-* [Set up project integrations](https://gitlab.com/fmugroup/weather-app/-/settings/integrations)
+Mais detalhes em `docs/flutter-handoff.md`. Em resumo: Auto Layout vira `Column`/`Row`, Fill vira `Expanded`, Variables viram `ThemeData`/`ColorScheme`, os estilos `Clima/*` viram `TextTheme` e os breakpoints viram `LayoutBuilder`.
 
-## Collaborate with your team
-
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+## Regerar prévias/SVGs depois de editar `code.js`
+```bash
+cd tools && node render.mjs   # precisa de Node + puppeteer + Google Chrome
+```
+O simulador também confere as regras da API do Figma (FILL só dentro de Auto Layout, fonte carregada antes do texto etc.) antes de gerar os arquivos.
