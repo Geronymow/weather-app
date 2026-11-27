@@ -320,7 +320,8 @@ class _PlacesPageState extends State<PlacesPage> {
       ];
     }
 
-    return ColoredBox(
+    // Material (não ColoredBox): os ListTile pintam o toque nele.
+    return Material(
       color: c.bgBase,
       child: SafeArea(
         bottom: false,

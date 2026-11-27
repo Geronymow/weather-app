@@ -149,4 +149,26 @@ void main() {
     expect(find.text('Buscar cidade, bairro ou CEP'), findsOneWidget);
     expect(find.text('São Paulo, SP'), findsOneWidget);
   });
+
+  testWidgets('Alertas e resultados da busca abrem sem erros', (tester) async {
+    final state = await _makeState(prefs: {'onboarded': true});
+    await _pumpApp(tester, state);
+
+    await tester.tap(find.byIcon(Icons.notifications_none_rounded).first);
+    await tester.pumpAndSettle();
+    expect(find.text('AMARELO · PERIGO POTENCIAL'), findsOneWidget);
+    expect(find.text('NOTIFICAÇÕES'), findsOneWidget);
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Locais'));
+    await tester.pumpAndSettle();
+    await tester.runAsync(() async {
+      await tester.enterText(find.byType(TextField), 'Curitiba');
+      await Future<void>.delayed(const Duration(milliseconds: 600));
+    });
+    await tester.pump();
+    expect(find.text('RESULTADOS'), findsOneWidget);
+    expect(find.text('PR · Brasil'), findsOneWidget);
+  });
 }

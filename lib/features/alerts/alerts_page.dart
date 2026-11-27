@@ -257,7 +257,7 @@ class _Group extends StatelessWidget {
     final c = ClimaColors.of(context);
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
-      child: ColoredBox(
+      child: Material(
         color: c.surface,
         child: Column(children: [
           for (var i = 0; i < children.length; i++) ...[

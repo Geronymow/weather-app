@@ -19,7 +19,7 @@ class SettingsPage extends StatelessWidget {
     final s = app.settings;
     void set(AppSettings n) => app.updateSettings(n);
 
-    return ColoredBox(
+    return Material(
       color: c.bgBase,
       child: SafeArea(
         bottom: false,
