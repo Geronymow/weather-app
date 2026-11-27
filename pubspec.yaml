@@ -1,0 +1,31 @@
+name: clima_agora
+description: "Clima Agora — app do tempo (Flutter, mobile-first e web)."
+publish_to: 'none'
+
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.14.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  material_ui: ^1.1.0
+  cupertino_icons: ^1.0.8
+
+  # Mesmo stack do weather-app-flutter
+  http: ^1.6.0
+  geolocator: ^14.1.2
+  intl: ^0.20.2
+  google_fonts: ^9.0.0
+
+  # Locais salvos, ajustes e cache offline
+  shared_preferences: ^2.5.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
